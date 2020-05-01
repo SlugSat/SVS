@@ -1,2 +1,3 @@
-# 3HC
-3-Axis Helmholtz Coil
+# SVS
+Solar Vector Simulator
+
