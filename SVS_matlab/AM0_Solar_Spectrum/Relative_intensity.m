@@ -55,7 +55,7 @@ red_intensity_multiplier = watt ./ trapz(LED_R(:,1), LED_R(:,2));
 LED_R (:,2) = LED_R(:,2) .*red_intensity_multiplier; %should be in w/nm
 
 %creates an estimate for the UV LED using a guasing
-watt=.4; %with current being near 0.25A
+watt=.930/2; %with current being near 0.25A
 LED_UV= guass_estimate(405,20);
 
 UV_intensity_multiplier = watt ./ trapz(LED_UV(:,1), LED_UV(:,2));
@@ -69,9 +69,7 @@ photopic_band = photopic(photopic(:,1)>LED_BB(1,1) & photopic(:,1)<LED_BB(end,1)
 
 LED_BB_interp=interp1(LED_BB(:,1),LED_BB(:,2),photopic_band(:,1));
 Bblue_intensity_multiplier = (lumen) ./ (683*trapz(photopic_band(:,1), LED_BB_interp.*photopic_band(:,2)));
-
 LED_BB (:,2) = LED_BB(:,2) .*Bblue_intensity_multiplier; %should be in w/nm
-
 %Retrieves Blue LED portion of curve and converts it to scaled intensity
 cd = 140;
 % filename='GW_CS8PM1_EM__blue__spectrum.csv';
@@ -98,7 +96,7 @@ yellow_intensity_multiplier = (cd.*0.9574) ./ (683*trapz(photopic_band(:,1), LED
 LED_W_Y (:,2) = LED_W_Y(:,2) .*yellow_intensity_multiplier; %should be in w/nm
 
 LED_W= [LED_W_B(1:end-1,:);LED_W_Y];
-
+Estimation=trapz(LED_W(:,1),LED_W(:,2));
 %Retrieves Green LED portion of curve and converts it to scaled intensity
 % filename='GREEN_LED.csv';
 % LED_G = csvread(filename,1,0,[1 0 100 1]);
