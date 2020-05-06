@@ -5,9 +5,6 @@ close all;
 %Retrieves Solar Spectrum and creates a matrix with the visible spectrum
 filename='ASTM_SolarIrradiance_AM0.csv';
 Solar_reference = csvread(filename,1,0,[1 0 1697 1]);
-
-colorSpectrum = Solar_reference(Solar_reference(:,1)>0.3 & Solar_reference(:,1)<0.9,:);
-
 total=trapz(Solar_reference(:,1),Solar_reference(:,2));
 slot = Solar_reference(Solar_reference(:,1)>0.4 & Solar_reference(:,1)<0.5,:);
 first = trapz(slot(:,1),slot(:,2));
@@ -21,163 +18,163 @@ slot = Solar_reference(Solar_reference(:,1)>0.8 & Solar_reference(:,1)<0.9,:);
 fifth = trapz(slot(:,1),slot(:,2));
 slot = Solar_reference(Solar_reference(:,1)>0.9 & Solar_reference(:,1)<1.1,:);
 six = trapz(slot(:,1),slot(:,2));
-colorIrradiance=trapz(colorSpectrum(:,1),colorSpectrum(:,2));
-percentageOfVisibleLight= (colorIrradiance/total)*100;
 
-fprintf('Total Irradiance %.2f\n',total);
-fprintf('Visible Light Irradiance %.2f\n', colorIrradiance);
-fprintf('Visible Light Irradiance percentage of total %.2f%%\n', percentageOfVisibleLight);
+LENGTH = 0.01;
+AREA = LENGTH.^2;
+%figure (3);
+x=0:LENGTH/100:LENGTH;
+y=0:LENGTH/100:LENGTH;
+DISTANCE =0.115;
+[X Y LED_W] = LED_irradiance([0 0 DISTANCE],0.2835,LENGTH, 120);
+W= trapz(y,trapz(x,LED_W,2));
+W=W./AREA;
 
-%Retrieves Photopic curve
-filename='PhotopicCurve.csv';
-photopic = csvread(filename,1,0,[1 0 471 1]);
+%figure (2);
+[X Y LED_B] = LED_irradiance([0 0 DISTANCE],0.072188,LENGTH, 120);
+B= trapz(y,trapz(x,LED_B,2));
+B=B./AREA;
 
-%Retrieves IR data
-% filename='QTH.csv';
-% QTH = csvread(filename,1,0,[1 0 625 1]);
-filename='QTH_v1.csv';
-QTH = csvread(filename,1,0,[1 0 212 1]);
+%figure(3);
+[X Y LED_DP] = LED_irradiance([0 0 DISTANCE],0.21867,LENGTH, 120);
+DP= trapz(y,trapz(x,LED_DP,2));
+DP=DP./AREA;
 
-%creates an estimate for the Deep Blue LED using a guasing
-watt=.660/2; %with current being near 0.25A
-filename='GD_CSXPM1_14_20160712_spectrum.csv';
-LED_B = csvread(filename,1,0,[1 0 66 1]);
+%figure(4);
+[X Y LED_G] = LED_irradiance([0 0 DISTANCE],0.089,LENGTH, 120);
+G= trapz(y,trapz(x,LED_G,2));
+G=G./AREA;
 
-B_intensity_multiplier = watt ./ trapz(LED_B(:,1), LED_B(:,2));
-LED_B (:,2) = LED_B(:,2) .*B_intensity_multiplier; %should be in w/nm
+%figure(5);
+[X Y LED_R] = LED_irradiance([0 0 DISTANCE],0.08976,LENGTH, 120);
+R= trapz(y,trapz(x,LED_R,2));
+R=R./AREA;
 
-%Getting Far red spectrum from data
-watt = 0.383/2; % at 200mA
-filename='far_red_spectrum.csv';
-LED_R = csvread(filename,1,0,[1 0 136 1]);
+%figure(6);
+[X Y LED_UV] = LED_irradiance([0 0 DISTANCE],0.1273,LENGTH, 120);
+UV= trapz(y,trapz(x,LED_UV,2));
+UV=UV./AREA;
 
-red_intensity_multiplier = watt ./ trapz(LED_R(:,1), LED_R(:,2));
-LED_R (:,2) = LED_R(:,2) .*red_intensity_multiplier; %should be in w/nm
+[X Y LED_V] = LED_irradiance([0 0 DISTANCE],0.1089,LENGTH, 165);
+V= trapz(y,trapz(x,LED_V,2));
+V=V./AREA;
 
-%creates an estimate for the UV LED using a guasing
-watt=.930/2; %with current being near 0.25A
-LED_UV= guass_estimate(405,20);
+[X Y LED_C] = LED_irradiance([0 0 DISTANCE],0.1344,LENGTH, 120);
+C= trapz(y,trapz(x,LED_C,2));
+C=C./AREA;
 
-UV_intensity_multiplier = watt ./ trapz(LED_UV(:,1), LED_UV(:,2));
-LED_UV (:,2) = LED_UV(:,2) .*UV_intensity_multiplier; %should be in w/nm
-
-%creates an estimate for the real blue using a guasing
-lumen=45.7/2; %with current being near 0.20A
-LED_BB= guass_estimate(475,20);
-
-photopic_band = photopic(photopic(:,1)>LED_BB(1,1) & photopic(:,1)<LED_BB(end,1),:);
-
-LED_BB_interp=interp1(LED_BB(:,1),LED_BB(:,2),photopic_band(:,1));
-Bblue_intensity_multiplier = (lumen) ./ (683*trapz(photopic_band(:,1), LED_BB_interp.*photopic_band(:,2)));
-LED_BB (:,2) = LED_BB(:,2) .*Bblue_intensity_multiplier; %should be in w/nm
 
 %Retrieves Blue LED portion of curve and converts it to scaled intensity
-cd = 140;
-% filename='GW_CS8PM1_EM__blue__spectrum.csv';
-% LED_W_B = csvread(filename,1,0,[1 0 66 1]);
 filename='white_blue_v2_spectrum.csv';
 LED_W_B =csvread(filename,1,0,[1 0 66 1]);
 
-photopic_band = photopic(photopic(:,1)>LED_W_B(1,1) & photopic(:,1)<LED_W_B(end,1),:);
-
-LED_W_interp=interp1(LED_W_B(:,1),LED_W_B(:,2),photopic_band(:,1));
-blue_intensity_multiplier = (cd.*0.0426) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+blue_intensity_multiplier = (W.*0.2368) ./ (trapz(LED_W_B(:,1), LED_W_B(:,2)));
 LED_W_B (:,2) = LED_W_B(:,2) .*blue_intensity_multiplier; %should be in w/nm
 
 %Retrieves yellow LED portion of curve and converts it to scaled intensity
-% filename='GW_CS8PM1_EM_yellow_spectrum.csv';
-% LED_W_Y =csvread(filename,1,0,[1 0 135 1]);
 filename='white_yellow_v2_spectrum.csv';
 LED_W_Y =csvread(filename,1,0,[1 0 136 1]);
 
-photopic_band = photopic (photopic(:,1)>LED_W_Y(1,1) & photopic(:,1)<LED_W_Y(end,1),:);
-
-LED_W_interp=interp1(LED_W_Y(:,1),LED_W_Y(:,2),photopic_band(:,1));
-yellow_intensity_multiplier = (cd.*0.9574) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+yellow_intensity_multiplier = (W.*0.7632) ./ (trapz(LED_W_Y(:,1), LED_W_Y(:,2)));
 LED_W_Y (:,2) = LED_W_Y(:,2) .*yellow_intensity_multiplier; %should be in w/nm
 
 LED_W= [LED_W_B(1:end-1,:);LED_W_Y];
-Estimation=trapz(LED_W(:,1),LED_W(:,2));
+
+
+%Reads Deep Blue from data
+filename='GD_CSXPM1_14_20160712_spectrum.csv';
+LED_B = csvread(filename,1,0,[1 0 66 1]);
+
+B_intensity_multiplier = DP ./ trapz(LED_B(:,1), LED_B(:,2));
+LED_B (:,2) = LED_B(:,2) .*B_intensity_multiplier; %should be in w/nm
+
+%Getting Far red spectrum from data
+filename='far_red_spectrum.csv';
+LED_R = csvread(filename,1,0,[1 0 136 1]);
+
+red_intensity_multiplier = R ./ trapz(LED_R(:,1), LED_R(:,2));
+LED_R (:,2) = LED_R(:,2) .*red_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the UV LED using a guasing
+LED_UV= guass_estimate(405,20);
+UV_intensity_multiplier = UV ./ trapz(LED_UV(:,1), LED_UV(:,2));
+LED_UV (:,2) = LED_UV(:,2) .*UV_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the Violet LED using a guasing
+LED_V= guass_estimate(425,20);
+V_intensity_multiplier = V ./ trapz(LED_V(:,1), LED_V(:,2));
+LED_V (:,2) = LED_V(:,2) .*V_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the Violet LED using a guasing
+LED_C= guass_estimate(490,25);
+C_intensity_multiplier = C ./ trapz(LED_C(:,1), LED_C(:,2));
+LED_C (:,2) = LED_C(:,2) .*C_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the real blue using a guasing
+LED_BB= guass_estimate(475,20);
+Bblue_intensity_multiplier = DP ./ (trapz(LED_BB(:,1),LED_BB(:,2)));
+LED_BB (:,2) = LED_BB(:,2) .*Bblue_intensity_multiplier; %should be in w/nm
+
 %Retrieves Green LED portion of curve and converts it to scaled intensity
 % filename='GREEN_LED.csv';
 % LED_G = csvread(filename,1,0,[1 0 100 1]);
 filename='true_green_spectrum.csv';
 LED_G = csvread(filename,1,0,[1 0 150 1]);
-
-lumen=143; %
-photopic_band = photopic (photopic(:,1)>LED_G(1,1) & photopic(:,1)<LED_G(end,1),:);
-LED_G_interp=interp1(LED_G(:,1),LED_G(:,2),photopic_band(:,1));
-green_intensity_multiplier= (lumen) ./ (683*trapz(photopic_band(:,1), LED_G_interp.*photopic_band(:,2)));
+green_intensity_multiplier= G ./ (trapz(LED_G(:,1),LED_G(:,2)));
 LED_G (:,2) = (LED_G(:,2) .*green_intensity_multiplier); %should be in w/nm
 
-N_W_LEDS=6; %number of white leds
-N_G_LEDS=1; %number of green leds
-N_UV_LEDS=1; %1 led will be taking up two spots
-N_QTH=0.25;
+%Retrieves IR data
+filename='QTH_V1.csv';
+QTH = csvread(filename,1,0,[1 0 211 1]);
+QTH(:,2)= QTH(:,2)/4; %Converting mW values to W values and multiply by 25 due to emitting closer
+
+N_W_LEDS=10; %number of white leds
+N_G_LEDS=4; %number of green leds
+N_UV_LEDS=3; 
+N_QTH=1;
 N_B_LEDS=1;
 N_BB_LEDS=1;
-N_R_LEDS=1;
+N_R_LEDS=3;
+N_V_LEDS=2;
+N_C_LEDS=3;
 
-totalLED = combineSpectrum(LED_W,LED_UV,N_W_LEDS,N_UV_LEDS);
-totalLED = combineSpectrum(totalLED,LED_G,1,N_G_LEDS);
-totalLED = combineSpectrum(totalLED,LED_B,1,N_B_LEDS);
-totalLED = combineSpectrum(totalLED,LED_BB,1,N_BB_LEDS);
-totalLED = combineSpectrum(totalLED,LED_R,1,N_R_LEDS);
-AREA=0.01; %Area the light is immited in m^2
-totalIrradiance=totalLED;
-totalIrradiance(:,2) = totalLED(:,2)./AREA;
-
+totalIrradiance = combineSpectrum(LED_W,LED_UV,N_W_LEDS,N_UV_LEDS);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_G,1,N_G_LEDS);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_B,1,N_B_LEDS);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_BB,1,N_BB_LEDS);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_R,1,N_R_LEDS);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_V,1,N_V_LEDS);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_C,1,N_C_LEDS);
 totalIrradiance=combineSpectrum(totalIrradiance,QTH,1,N_QTH);
-
 figure (1);
-tiledlayout(2,1)
-
-nexttile
-plot(Solar_reference(:,1),Solar_reference(:,2));
+plot(Solar_reference(:,1).*1000,(Solar_reference(:,2)./1000));
 hold on
-area(colorSpectrum(:,1),colorSpectrum(:,2));
-hold off
-grid on;
-axis([0 4 0 2300]);
-title('Linear Plot of Spectral Irradiance @ AM0');
-xlabel('Wavelength (\mum)'); 
-ylabel('Spectral Irradiance (W/m^2 -\mum )');
-
-nexttile
-loglog(Solar_reference(:,1),Solar_reference(:,2));
+plot(LED_W(:,1),(LED_W(:,2).*N_W_LEDS));
 hold on
-area(colorSpectrum(:,1),colorSpectrum(:,2));
-hold off
-grid on;
-title('log-log Plot of Spectral Irradiance @ AM0');
-xlabel('Wavelength (\mum)'); 
-ylabel('Spectral Irradiance (W/m^2 -\mum )');
-
-figure (2);
-plot(Solar_reference(:,1).*1000,Solar_reference(:,2)./1000);
+plot(LED_G(:,1),(LED_G(:,2).*N_G_LEDS));
 hold on
-plot(LED_W(:,1),(LED_W(:,2).*N_W_LEDS)./AREA);
+plot(LED_UV(:,1),(LED_UV(:,2).*N_UV_LEDS));
 hold on
-plot(LED_G(:,1),(LED_G(:,2).*N_G_LEDS)./AREA);
+plot(LED_BB(:,1),(LED_BB(:,2).*N_BB_LEDS));
 hold on
-plot(LED_UV(:,1),(LED_UV(:,2).*N_UV_LEDS)./AREA);
+plot(LED_B(:,1),(LED_B(:,2).*N_B_LEDS));
 hold on
-plot(LED_BB(:,1),(LED_BB(:,2).*N_B_LEDS)./AREA);
+plot(LED_R(:,1),(LED_R(:,2).*N_R_LEDS));
 hold on
-plot(LED_B(:,1),(LED_B(:,2).*N_B_LEDS)./AREA);
+plot(LED_V(:,1),(LED_V(:,2).*N_V_LEDS));
 hold on
-plot(LED_R(:,1),(LED_R(:,2).*N_R_LEDS)./AREA);
+plot(LED_C(:,1),(LED_C(:,2).*N_C_LEDS));
 hold on
 plot(QTH(:,1),QTH(:,2).*N_QTH);
 hold off
 
+legend({'Solar Reference','White','Green','UV','BB','B','R'})
 grid on;
 axis([400 1100 0 2.5]);
 title('Plot of Spectral Irradiance @ AM0 with Light Sources');
 xlabel('Wavelength (nm)'); 
 ylabel('Spectral Irradiance (W/m^2 /nm )');
 
-figure(3);
+figure (2);
 plot(Solar_reference(:,1).*1000,Solar_reference(:,2)./1000);
 
 hold on
