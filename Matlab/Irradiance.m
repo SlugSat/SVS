@@ -104,7 +104,7 @@ LED_V= guass_estimate(425,20);
 V_intensity_multiplier = V ./ trapz(LED_V(:,1), LED_V(:,2));
 LED_V (:,2) = LED_V(:,2) .*V_intensity_multiplier; %should be in w/nm
 
-%creates an estimate for the Violet LED using a guasing
+%creates an estimate for the Cyan LED using a guasing
 LED_C= guass_estimate(490,25);
 C_intensity_multiplier = C ./ trapz(LED_C(:,1), LED_C(:,2));
 LED_C (:,2) = LED_C(:,2) .*C_intensity_multiplier; %should be in w/nm
@@ -127,9 +127,9 @@ filename='QTH_V1.csv';
 QTH = csvread(filename,1,0,[1 0 211 1]);
 QTH(:,2)= QTH(:,2)/4; %Converting mW values to W values and multiply by 25 due to emitting closer
 
-N_W_LEDS=10; %number of white leds
+N_W_LEDS=9; %number of white leds
 N_G_LEDS=4; %number of green leds
-N_UV_LEDS=3; 
+N_UV_LEDS=4; 
 N_QTH=1;
 N_B_LEDS=1;
 N_BB_LEDS=1;

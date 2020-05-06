@@ -98,6 +98,74 @@ LED_W_Y (:,2) = LED_W_Y(:,2) .*yellow_intensity_multiplier; %should be in w/nm
 
 LED_W= [LED_W_B(1:end-1,:);LED_W_Y];
 Estimation=trapz(LED_W(:,1),LED_W(:,2));
+
+
+
+
+
+
+
+%Retrieves Blue LED portion of curve and converts it to scaled intensity
+cd = 150;
+filename='GW_CSSRM2pm_blue_4000K_20181122_spectrum.csv';
+LED_W_B_4 =csvread(filename,1,0,[1 0 66 1]);
+
+photopic_band = photopic(photopic(:,1)>LED_W_B_4(1,1) & photopic(:,1)<LED_W_B_4(end,1),:);
+
+LED_W_interp=interp1(LED_W_B_4(:,1),LED_W_B_4(:,2),photopic_band(:,1));
+blue_intensity_multiplier = (cd.*0.0425) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+LED_W_B_4 (:,2) = LED_W_B_4(:,2) .*blue_intensity_multiplier; %should be in w/nm
+
+%Retrieves yellow LED portion of curve and converts it to scaled intensity
+filename='GW_CSSRM2pm_yellow_4000K_20181122_spectrum.csv';
+LED_W_Y_4 =csvread(filename,1,0,[1 0 136 1]);
+
+photopic_band = photopic (photopic(:,1)>LED_W_Y_4(1,1) & photopic(:,1)<LED_W_Y_4(end,1),:);
+
+LED_W_interp=interp1(LED_W_Y_4(:,1),LED_W_Y_4(:,2),photopic_band(:,1));
+yellow_intensity_multiplier = (cd.*0.9574) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+LED_W_Y_4 (:,2) = LED_W_Y_4(:,2) .*yellow_intensity_multiplier; %should be in w/nm
+
+LED_W_4= [LED_W_B_4(1:end-1,:);LED_W_Y_4];
+Warm_est=trapz(LED_W_4(:,1),LED_W_4(:,2));
+
+%Retrieves Blue LED portion of curve and converts it to scaled intensity
+cd = 150;
+filename='GW_CSSRM2pm_blue_5700K_20181122_spectrum.csv';
+LED_W_B_5 =csvread(filename,1,0,[1 0 66 1]);
+
+photopic_band = photopic(photopic(:,1)>LED_W_B_5(1,1) & photopic(:,1)<LED_W_B_5(end,1),:);
+
+LED_W_interp=interp1(LED_W_B_5(:,1),LED_W_B_5(:,2),photopic_band(:,1));
+blue_intensity_multiplier = (cd.*0.0591) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+LED_W_B_5 (:,2) = LED_W_B_5(:,2) .*blue_intensity_multiplier; %should be in w/nm
+
+%Retrieves yellow LED portion of curve and converts it to scaled intensity
+filename='GW_CSSRM2pm_yellow_5700K_20181122_spectrum.csv';
+LED_W_Y_5 =csvread(filename,1,0,[1 0 136 1]);
+
+photopic_band = photopic (photopic(:,1)>LED_W_Y_5(1,1) & photopic(:,1)<LED_W_Y_5(end,1),:);
+
+LED_W_interp=interp1(LED_W_Y_5(:,1),LED_W_Y_5(:,2),photopic_band(:,1));
+yellow_intensity_multiplier = (cd.*0.9409) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+LED_W_Y_5 (:,2) = LED_W_Y_5(:,2) .*yellow_intensity_multiplier; %should be in w/nm
+
+LED_W_5= [LED_W_B_5(1:end-1,:);LED_W_Y_5];
+cool_est=trapz(LED_W_5(:,1),LED_W_5(:,2));
+
+figure (4);
+
+plot(LED_W_5(:,1),(LED_W_5(:,2)));
+hold on
+plot(LED_W_4(:,1),(LED_W_4(:,2)));
+hold off
+
+
+
+
+
+
+
 %Retrieves Green LED portion of curve and converts it to scaled intensity
 % filename='GREEN_LED.csv';
 % LED_G = csvread(filename,1,0,[1 0 100 1]);
