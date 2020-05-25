@@ -2,22 +2,21 @@ clc;
 clear;
 close all;
 
-LENGTH = 0.01;
+LENGTH = 0.05;
 AREA = LENGTH.^2;
-
-x=0:LENGTH/100:LENGTH;
-y=0:LENGTH/100:LENGTH;
-DISTANCE =0.115;
+x=0:LENGTH/10:LENGTH;
+y=0:LENGTH/10:LENGTH;
+DISTANCE =0.118;
 LED_W_Positions = [ 
-    0.001 0 DISTANCE; 
-    -0.004 0 DISTANCE;
-    -0.005 0.005 DISTANCE; 
-    -0.005 -0.005 DISTANCE;
-    0 0.005 DISTANCE;
-    0 -0.005 DISTANCE;
-    0.005 0 DISTANCE;
-    0.005 0.005 DISTANCE;
-    0.005 -0.005 DISTANCE
+    0.005 0 DISTANCE; 
+    -0.025 0 DISTANCE;
+    -0.025 0.025 DISTANCE; 
+    -0.025 -0.025 DISTANCE;
+    0 0.025 DISTANCE;
+    0 -0.025 DISTANCE;
+    0.025 0 DISTANCE;
+    0.025 0.025 DISTANCE;
+    0.025 -0.025 DISTANCE
     ];
 sum = zeros(length(x),length(x));
 for i = 1:9
@@ -38,7 +37,7 @@ W=W./AREA;
 
 % figure(2);
 LED_DP_Positions = [ 
-    -0.001 0 DISTANCE
+    -0.005 0 DISTANCE
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:1
@@ -58,10 +57,10 @@ sum = sum+sumBuffer;
 
 % figure(3);
 LED_G_Positions = [ 
-    0.004 0.004 DISTANCE;
-    0.004 -0.004 DISTANCE;
-    -0.004 0.004 DISTANCE;
-    -0.004 -0.004 DISTANCE;
+    0.020 0.02 DISTANCE;
+    0.02 -0.02 DISTANCE;
+    -0.02 0.02 DISTANCE;
+    -0.02 -0.02 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:4
@@ -81,9 +80,9 @@ sum = sum+sumBuffer;
 
 % figure(4);
 LED_R_Positions = [ 
-    -0.005 0.004 DISTANCE;
-    0.005 0.001 DISTANCE;
-    -0.001 -0.005 DISTANCE;
+    -0.025 0.02 DISTANCE;
+    0.025 0.005 DISTANCE;
+    -0.005 -0.025 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:3
@@ -103,13 +102,13 @@ sum = sum+sumBuffer;
 
 % figure(5);
 LED_UV_Positions = [
-    0.003 0.003 DISTANCE;
-    0.003 -0.003 DISTANCE;
-    -0.003 0.003 DISTANCE;
-    -0.003 -0.003 DISTANCE;
+    0.015 0.015 DISTANCE;
+    0.015 -0.015 DISTANCE;
+    -0.015 0.015 DISTANCE;
+    -0.015 -0.015 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
-for i = 1:4
+for i = 1:3
     [X Y LED] = LED_irradiance(LED_UV_Positions(i,:),0.1273,LENGTH, 120);
     sumBuffer =sumBuffer+LED;
 end
@@ -126,8 +125,8 @@ sum=sum+sumBuffer;
 
 % figure(6);
 LED_V_Positions = [ 
-    -0.003 0.004 DISTANCE;
-    0.003 -0.004 DISTANCE;
+    -0.015 0.02 DISTANCE;
+    0.015 -0.02 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:2
@@ -147,9 +146,9 @@ sum =sum+sumBuffer;
 
 % figure(7);
 LED_C_Positions = [ 
-    -0.005 -0.001 DISTANCE;
-    0.001 0.005 DISTANCE;
-    0.005 -0.004 DISTANCE;
+    -0.025 -0.005 DISTANCE;
+    0.005 0.025 DISTANCE;
+    0.025 -0.02 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:3
@@ -169,7 +168,7 @@ sum=sum+sumBuffer;
 
 % figure(8);
 LED_B_Positions = [ 
-    0 -0.001 DISTANCE;
+    0 -0.005 DISTANCE;
 
 ];
 sumBuffer = zeros(length(x),length(x));
@@ -190,12 +189,14 @@ sum=sum+sumBuffer;
 
 figure(9);
 surf(X,Y,sum);
-colorbar
+cbar =colorbar;
+cbar.Label.String = 'Irradiance W/m^2';
+
 view(2);
-xlabel('Cubesat X Coordinate m');
-ylabel('Cubesat Y Coordinate m');
+xlabel('Cubesat X Coordinate (m)');
+ylabel('Cubesat Y Coordinate (m)');
 zlabel('Irradiance W/m^2');
-title('Irradiance on CubeSat Surface with 0.115m Distance');
+title('Irradiance on CubeSat Surface with 0.118m Distance');
 
 max = max(max(sum));
 min=min(min(sum));
@@ -217,7 +218,11 @@ hold on
 plot(LED_W_Positions(:,1),LED_W_Positions(:,2),'kX','Markersize',20);
 hold on
 plot(LED_B_Positions(:,1),LED_B_Positions(:,2),'bX','Markersize',20);
+%hold on
+%circle([LED_C_Positions(:,1);LED_DP_Positions(:,1);LED_G_Positions(:,1);LED_R_Positions(:,1);LED_UV_Positions(:,1);LED_V_Positions(:,1);LED_W_Positions(:,1);LED_B_Positions(:,1)],[LED_C_Positions(:,2);LED_DP_Positions(:,2);LED_G_Positions(:,2);LED_R_Positions(:,2);LED_UV_Positions(:,2);LED_V_Positions(:,2);LED_W_Positions(:,2);LED_B_Positions(:,2)], 0.0198);
 hold off
+axis equal;
+axis([-LENGTH/2 LENGTH/2 -LENGTH/2 LENGTH/2])
 legend('Cyan','Deep Blue', 'Green', 'Red', 'UV','Violet','White','Blue');
 title('LED Bulb Placement on Panel');
 xlabel('X position (m)'); 
@@ -286,7 +291,7 @@ LED_C= guass_estimate(490,25);
 C_intensity_multiplier = C ./ trapz(LED_C(:,1), LED_C(:,2));
 LED_C (:,2) = LED_C(:,2) .*C_intensity_multiplier; %should be in w/nm
 
-%creates an estimate for the real blue using a guasing
+%creates an estimate for the royal blue using a guasing
 LED_BB= guass_estimate(475,20);
 Bblue_intensity_multiplier = DP ./ (trapz(LED_BB(:,1),LED_BB(:,2)));
 LED_BB (:,2) = LED_BB(:,2) .*Bblue_intensity_multiplier; %should be in w/nm
@@ -304,44 +309,35 @@ filename='QTH_V1.csv';
 QTH = csvread(filename,1,0,[1 0 211 1]);
 QTH(:,2)= QTH(:,2)/4; %Converting mW values to W values and multiply by 25 due to emitting closer
 
-N_W_LEDS=1; %number of white leds
-N_G_LEDS=1; %number of green leds
-N_UV_LEDS=1; 
-N_QTH=1;
-N_B_LEDS=1;
-N_BB_LEDS=1;
-N_R_LEDS=1;
-N_V_LEDS=1;
-N_C_LEDS=1;
-
-totalIrradiance = combineSpectrum(LED_W,LED_UV,N_W_LEDS,N_UV_LEDS);
-totalIrradiance = combineSpectrum(totalIrradiance,LED_G,1,N_G_LEDS);
-totalIrradiance = combineSpectrum(totalIrradiance,LED_B,1,N_B_LEDS);
-totalIrradiance = combineSpectrum(totalIrradiance,LED_BB,1,N_BB_LEDS);
-totalIrradiance = combineSpectrum(totalIrradiance,LED_R,1,N_R_LEDS);
-totalIrradiance = combineSpectrum(totalIrradiance,LED_V,1,N_V_LEDS);
-totalIrradiance = combineSpectrum(totalIrradiance,LED_C,1,N_C_LEDS);
-totalIrradiance=combineSpectrum(totalIrradiance,QTH,1,N_QTH);
+totalIrradiance = combineSpectrum(LED_W,LED_UV,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_G,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_B,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_BB,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_R,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_V,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_C,1,1);
+totalIrradiance(:,2)=totalIrradiance(:,2).*1.5;
+totalIrradiance=combineSpectrum(totalIrradiance,QTH,1,1);
 figure (1);
 plot(Solar_reference(:,1).*1000,(Solar_reference(:,2)./1000));
 hold on
-plot(LED_W(:,1),(LED_W(:,2).*N_W_LEDS));
+plot(LED_W(:,1),(LED_W(:,2)));
 hold on
-plot(LED_G(:,1),(LED_G(:,2).*N_G_LEDS));
+plot(LED_G(:,1),(LED_G(:,2)));
 hold on
-plot(LED_UV(:,1),(LED_UV(:,2).*N_UV_LEDS));
+plot(LED_UV(:,1),(LED_UV(:,2)));
 hold on
-plot(LED_BB(:,1),(LED_BB(:,2).*N_BB_LEDS));
+plot(LED_BB(:,1),(LED_BB(:,2)));
 hold on
-plot(LED_B(:,1),(LED_B(:,2).*N_B_LEDS));
+plot(LED_B(:,1),(LED_B(:,2)));
 hold on
-plot(LED_R(:,1),(LED_R(:,2).*N_R_LEDS));
+plot(LED_R(:,1),(LED_R(:,2)));
 hold on
-plot(LED_V(:,1),(LED_V(:,2).*N_V_LEDS));
+plot(LED_V(:,1),(LED_V(:,2)));
 hold on
-plot(LED_C(:,1),(LED_C(:,2).*N_C_LEDS));
+plot(LED_C(:,1),(LED_C(:,2)));
 hold on
-plot(QTH(:,1),QTH(:,2).*N_QTH);
+plot(QTH(:,1),QTH(:,2));
 hold off
 
 legend({'Solar Reference','White','Green','UV','Deep Blue','Blue','Red','Violet','Cyan','QTH'})
