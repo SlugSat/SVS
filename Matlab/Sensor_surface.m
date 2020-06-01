@@ -2,7 +2,7 @@ clc;
 clear;
 close all;
 
-LENGTH = 0.05;
+LENGTH = 0.10;
 AREA = LENGTH.^2;
 x=0:LENGTH/10:LENGTH;
 y=0:LENGTH/10:LENGTH;
