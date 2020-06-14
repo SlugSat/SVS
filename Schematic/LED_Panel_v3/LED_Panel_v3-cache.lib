@@ -79,6 +79,22 @@ X A 2 150 0 100 L 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
+# Device_Lamp
+#
+DEF Device_Lamp LA 0 1 N N 1 F N
+F0 "LA" 25 150 50 H V L CNN
+F1 "Device_Lamp" 25 -150 50 H V L CNN
+F2 "" 0 100 50 V I C CNN
+F3 "" 0 100 50 V I C CNN
+DRAW
+C 0 0 100 0 1 0 N
+P 2 0 1 0 -70 70 70 -70 N
+P 2 0 1 0 70 70 -70 -70 N
+X - 1 0 -200 100 U 50 50 1 1 P
+X + 2 0 200 100 D 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
 # Device_R_POT_US
 #
 DEF Device_R_POT_US RV 0 40 Y N 1 F N

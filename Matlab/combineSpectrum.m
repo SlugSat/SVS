@@ -1,3 +1,7 @@
+%Function Combine Spectrum
+%Takes two spectrums and combines them within the same matrix
+%Spectrums are scaled in the amount of components with the same spectrum
+
 function [spectrum] = combineSpectrum( source1, source2, num1, num2)
     spectrum = [source1(:,1) source1(:,2).*num1];
     source2(:,2)=source2(:,2).*num2;

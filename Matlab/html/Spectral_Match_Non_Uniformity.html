@@ -1,0 +1,961 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Spectral_Match_Non_Uniformity</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-06-13"><meta name="DC.source" content="Spectral_Match_Non_Uniformity.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%Using Values from Spectral_Matchv1, the intensity and flux can be calculated</span>
+<span class="comment">%interchangeably. This Script places LED lambertian light sources 118mm</span>
+<span class="comment">%above test area of 2500mm^2.</span>
+clc;
+clear;
+close <span class="string">all</span>;
+
+<span class="comment">%Assigning test area and distance from</span>
+LENGTH = 0.05;
+AREA = LENGTH.^2;
+x=0:LENGTH/10:LENGTH;
+y=0:LENGTH/10:LENGTH;
+DISTANCE =0.118;
+
+LED_W_Positions = [
+    0 0 DISTANCE;
+    0.035 0 DISTANCE;
+    0.035 0.035 DISTANCE;
+    0.035 -0.035 DISTANCE;
+    -0.035 0.035 DISTANCE;
+    -0.035 -0.035 DISTANCE;
+    -0.035 0 DISTANCE;
+    0 -0.035 DISTANCE;
+    0 0.035 DISTANCE
+    ];
+sum = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:9
+    [X Y LED] = LED_irradiance(LED_W_Positions(i,:),0.2835,LENGTH, 120);
+    sum =sum+LED;
+<span class="keyword">end</span>
+W= trapz(y,trapz(x,sum,2));
+W=W./AREA;
+<span class="comment">% figure (1);</span>
+<span class="comment">% nexttile;</span>
+<span class="comment">% surf(X,Y,sum);</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+<span class="comment">% zlim([180 200]);</span>
+
+<span class="comment">% figure(2);</span>
+LED_DP_Positions = [
+     -0.00551 0 DISTANCE
+];
+sumBuffer = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:1
+    [X Y LED] = LED_irradiance(LED_DP_Positions(i,:),0.21867,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+<span class="keyword">end</span>
+DP= trapz(y,trapz(x,sumBuffer,2));
+DP=DP./AREA;
+<span class="comment">% surf(X,Y,sumBuffer);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+
+sum = sum+sumBuffer;
+
+<span class="comment">% figure(3);</span>
+LED_G_Positions = [
+    0.02183 0.01863 DISTANCE;
+    0.02183 -0.01863 DISTANCE;
+    -0.02183 0.01863 DISTANCE;
+    -0.02183 -0.01863 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:4
+    [X Y LED] = LED_irradiance(LED_G_Positions(i,:),0.089,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+<span class="keyword">end</span>
+G= trapz(y,trapz(x,sumBuffer,2));
+G=G./AREA;
+<span class="comment">% surf(X,Y,sumBuffer);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+
+sum = sum+sumBuffer;
+
+<span class="comment">% figure(4);</span>
+LED_R_Positions = [
+    0.035 -0.01398 DISTANCE;
+    -0.01207 -0.035 DISTANCE;
+    -0.035 0.02356 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:3
+    [X Y LED] = LED_irradiance(LED_R_Positions(i,:),0.08976,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+<span class="keyword">end</span>
+R= trapz(y,trapz(x,sumBuffer,2));
+R=R./AREA;
+<span class="comment">% surf(X,Y,sumBuffer);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+
+sum = sum+sumBuffer;
+
+<span class="comment">% figure(5);</span>
+LED_UV_Positions = [
+    0.01313 0.01313 DISTANCE;
+    0.01313 -0.01313 DISTANCE;
+    -0.01313 0.01313 DISTANCE;
+    -0.01313 -0.01313 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:3
+    [X Y LED] = LED_irradiance(LED_UV_Positions(i,:),0.1273,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+<span class="keyword">end</span>
+UV= trapz(y,trapz(x,sumBuffer,2));
+UV=UV./AREA;
+<span class="comment">% surf(X,Y,sumBuffer);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+
+sum=sum+sumBuffer;
+
+<span class="comment">% figure(6);</span>
+LED_V_Positions = [
+    -0.01313 0.02123 DISTANCE;
+    0.01313 -0.02123 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:2
+    [X Y LED] = LED_irradiance(LED_V_Positions(i,:),0.1089,LENGTH, 165);
+    sumBuffer =sumBuffer+LED;
+<span class="keyword">end</span>
+V= trapz(y,trapz(x,sumBuffer,2));
+V=V./AREA;
+<span class="comment">% surf(X,Y,sumBuffer);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+
+sum =sum+sumBuffer;
+
+<span class="comment">% figure(7);</span>
+LED_C_Positions = [
+    -0.035 -0.00551 DISTANCE;
+    0.00551 0.035 DISTANCE;
+    0.035 -0.029 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:3
+    [X Y LED] = LED_irradiance(LED_C_Positions(i,:),0.1344,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+<span class="keyword">end</span>
+C= trapz(y,trapz(x,sumBuffer,2));
+C=C./AREA;
+<span class="comment">% surf(X,Y,sumBuffer);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+
+sum=sum+sumBuffer;
+
+<span class="comment">% figure(8);</span>
+LED_B_Positions = [
+<span class="comment">    %%</span>
+    <span class="comment">%</span>
+    <span class="comment">%  PREFORMATTED</span>
+    <span class="comment">%  TEXT</span>
+    <span class="comment">%</span>
+    0.00551 0 DISTANCE;
+
+];
+sumBuffer = zeros(length(x),length(x));
+<span class="keyword">for</span> i = 1:1
+    [X Y LED] = LED_irradiance(LED_B_Positions(i,:),0.072188,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+<span class="keyword">end</span>
+B= trapz(y,trapz(x,sumBuffer,2));
+B=B./AREA;
+<span class="comment">% surf(X,Y,sumBuffer);</span>
+<span class="comment">% colorbar</span>
+<span class="comment">% view(2);</span>
+<span class="comment">% xlabel('Cubesat X Coordinate m');</span>
+<span class="comment">% ylabel('Cubesat Y Coordinate m');</span>
+<span class="comment">% zlabel('Irradiance W/m^2');</span>
+
+sum=sum+sumBuffer;
+
+figure(9);
+surf(X,Y,sum);
+cbar =colorbar;
+cbar.Label.String = <span class="string">'Irradiance W/m^2'</span>;
+
+view(2);
+xlabel(<span class="string">'Cubesat X Coordinate (m)'</span>);
+ylabel(<span class="string">'Cubesat Y Coordinate (m)'</span>);
+zlabel(<span class="string">'Irradiance W/m^2'</span>);
+title(<span class="string">'Irradiance on CubeSat Surface with 0.118m Distance'</span>);
+
+max = max(max(sum));
+min=min(min(sum));
+fprintf(<span class="string">'The Non-Uniformity is %.1f%%\n'</span>,((max-min)./(max+min)).*100);
+
+figure (10);
+plot(LED_C_Positions(:,1),LED_C_Positions(:,2),<span class="string">'cX'</span>,<span class="string">'Markersize'</span>,20);
+hold <span class="string">on</span>
+plot(LED_DP_Positions(:,1),LED_DP_Positions(:,2),<span class="string">'X'</span>,<span class="string">'Markersize'</span>,20);
+hold <span class="string">on</span>
+plot(LED_G_Positions(:,1),LED_G_Positions(:,2),<span class="string">'gX'</span>,<span class="string">'Markersize'</span>,20);
+hold <span class="string">on</span>
+plot(LED_R_Positions(:,1),LED_R_Positions(:,2),<span class="string">'rX'</span>,<span class="string">'Markersize'</span>,20);
+hold <span class="string">on</span>
+plot(LED_UV_Positions(:,1),LED_UV_Positions(:,2),<span class="string">'X'</span>,<span class="string">'Markersize'</span>,20);
+hold <span class="string">on</span>
+plot(LED_V_Positions(:,1),LED_V_Positions(:,2),<span class="string">'mX'</span>,<span class="string">'Markersize'</span>,20);
+hold <span class="string">on</span>
+plot(LED_W_Positions(:,1),LED_W_Positions(:,2),<span class="string">'kX'</span>,<span class="string">'Markersize'</span>,20);
+hold <span class="string">on</span>
+plot(LED_B_Positions(:,1),LED_B_Positions(:,2),<span class="string">'bX'</span>,<span class="string">'Markersize'</span>,20);
+<span class="comment">%hold on</span>
+<span class="comment">%circle([LED_C_Positions(:,1);LED_DP_Positions(:,1);LED_G_Positions(:,1);LED_R_Positions(:,1);LED_UV_Positions(:,1);LED_V_Positions(:,1);LED_W_Positions(:,1);LED_B_Positions(:,1)],[LED_C_Positions(:,2);LED_DP_Positions(:,2);LED_G_Positions(:,2);LED_R_Positions(:,2);LED_UV_Positions(:,2);LED_V_Positions(:,2);LED_W_Positions(:,2);LED_B_Positions(:,2)], 0.0198);</span>
+hold <span class="string">off</span>
+axis <span class="string">equal</span>;
+axis([-0.07/2 0.07/2 -0.07/2 0.07/2])
+legend(<span class="string">'Cyan'</span>,<span class="string">'Deep Blue'</span>, <span class="string">'Green'</span>, <span class="string">'Red'</span>, <span class="string">'UV'</span>,<span class="string">'Violet'</span>,<span class="string">'White'</span>,<span class="string">'Blue'</span>);
+title(<span class="string">'LED Bulb Placement on Panel'</span>);
+xlabel(<span class="string">'X position (m)'</span>);
+ylabel(<span class="string">'Y position (m)'</span>);
+
+<span class="comment">%Retrieves Solar Spectrum and creates a matrix with the visible spectrum</span>
+filename=<span class="string">'ASTM_SolarIrradiance_AM0.csv'</span>;
+Solar_reference = csvread(filename,1,0,[1 0 1697 1]);
+total=trapz(Solar_reference(:,1),Solar_reference(:,2));
+slot = Solar_reference(Solar_reference(:,1)&gt;0.4 &amp; Solar_reference(:,1)&lt;0.5,:);
+first = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)&gt;0.5 &amp; Solar_reference(:,1)&lt;0.6,:);
+second = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)&gt;0.6 &amp; Solar_reference(:,1)&lt;0.7,:);
+third = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)&gt;0.7 &amp; Solar_reference(:,1)&lt;0.8,:);
+fourth = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)&gt;0.8 &amp; Solar_reference(:,1)&lt;0.9,:);
+fifth = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)&gt;0.9 &amp; Solar_reference(:,1)&lt;1.1,:);
+six = trapz(slot(:,1),slot(:,2));
+
+<span class="comment">%Retrieves Blue LED portion of curve and converts it to scaled intensity</span>
+filename=<span class="string">'white_blue_v2_spectrum.csv'</span>;
+LED_W_B =csvread(filename,1,0,[1 0 66 1]);
+
+blue_intensity_multiplier = (W.*0.2368) ./ (trapz(LED_W_B(:,1), LED_W_B(:,2)));
+LED_W_B (:,2) = LED_W_B(:,2) .*blue_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%Retrieves yellow LED portion of curve and converts it to scaled intensity</span>
+filename=<span class="string">'white_yellow_v2_spectrum.csv'</span>;
+LED_W_Y =csvread(filename,1,0,[1 0 136 1]);
+
+yellow_intensity_multiplier = (W.*0.7632) ./ (trapz(LED_W_Y(:,1), LED_W_Y(:,2)));
+LED_W_Y (:,2) = LED_W_Y(:,2) .*yellow_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+LED_W= [LED_W_B(1:end-1,:);LED_W_Y];
+
+
+<span class="comment">%Reads Deep Blue from data</span>
+filename=<span class="string">'GD_CSXPM1_14_20160712_spectrum.csv'</span>;
+LED_B = csvread(filename,1,0,[1 0 66 1]);
+
+B_intensity_multiplier = DP ./ trapz(LED_B(:,1), LED_B(:,2));
+LED_B (:,2) = LED_B(:,2) .*B_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%Getting Far red spectrum from data</span>
+filename=<span class="string">'far_red_spectrum.csv'</span>;
+LED_R = csvread(filename,1,0,[1 0 136 1]);
+
+red_intensity_multiplier = R ./ trapz(LED_R(:,1), LED_R(:,2));
+LED_R (:,2) = LED_R(:,2) .*red_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%creates an estimate for the UV LED using a guasing</span>
+LED_UV= guass_estimate(405,20);
+UV_intensity_multiplier = UV ./ trapz(LED_UV(:,1), LED_UV(:,2));
+LED_UV (:,2) = LED_UV(:,2) .*UV_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%creates an estimate for the Violet LED using a guasing</span>
+LED_V= guass_estimate(425,20);
+V_intensity_multiplier = V ./ trapz(LED_V(:,1), LED_V(:,2));
+LED_V (:,2) = LED_V(:,2) .*V_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%creates an estimate for the Cyan LED using a guasing</span>
+LED_C= guass_estimate(490,25);
+C_intensity_multiplier = C ./ trapz(LED_C(:,1), LED_C(:,2));
+LED_C (:,2) = LED_C(:,2) .*C_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%creates an estimate for the royal blue using a guasing</span>
+LED_BB= guass_estimate(475,20);
+Bblue_intensity_multiplier = DP ./ (trapz(LED_BB(:,1),LED_BB(:,2)));
+LED_BB (:,2) = LED_BB(:,2) .*Bblue_intensity_multiplier; <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%Retrieves Green LED portion of curve and converts it to scaled intensity</span>
+<span class="comment">% filename='GREEN_LED.csv';</span>
+<span class="comment">% LED_G = csvread(filename,1,0,[1 0 100 1]);</span>
+filename=<span class="string">'true_green_spectrum.csv'</span>;
+LED_G = csvread(filename,1,0,[1 0 150 1]);
+green_intensity_multiplier= G ./ (trapz(LED_G(:,1),LED_G(:,2)));
+LED_G (:,2) = (LED_G(:,2) .*green_intensity_multiplier); <span class="comment">%should be in w/nm</span>
+
+<span class="comment">%Retrieves IR data</span>
+filename=<span class="string">'QTH_V1.csv'</span>;
+QTH = csvread(filename,1,0,[1 0 211 1]);
+QTH(:,2)= QTH(:,2)/4; <span class="comment">%Converting mW values to W values and multiply by 25 due to emitting closer</span>
+
+totalIrradiance = combineSpectrum(LED_W,LED_UV,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_G,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_B,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_BB,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_R,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_V,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_C,1,1);
+totalIrradiance(:,2)=totalIrradiance(:,2).*1.5;
+totalIrradiance=combineSpectrum(totalIrradiance,QTH,1,1);
+figure (1);
+plot(Solar_reference(:,1).*1000,(Solar_reference(:,2)./1000));
+hold <span class="string">on</span>
+plot(LED_W(:,1),(LED_W(:,2)));
+hold <span class="string">on</span>
+plot(LED_G(:,1),(LED_G(:,2)));
+hold <span class="string">on</span>
+plot(LED_UV(:,1),(LED_UV(:,2)));
+hold <span class="string">on</span>
+plot(LED_BB(:,1),(LED_BB(:,2)));
+hold <span class="string">on</span>
+plot(LED_B(:,1),(LED_B(:,2)));
+hold <span class="string">on</span>
+plot(LED_R(:,1),(LED_R(:,2)));
+hold <span class="string">on</span>
+plot(LED_V(:,1),(LED_V(:,2)));
+hold <span class="string">on</span>
+plot(LED_C(:,1),(LED_C(:,2)));
+hold <span class="string">on</span>
+plot(QTH(:,1),QTH(:,2));
+hold <span class="string">off</span>
+
+legend({<span class="string">'ASTM Solar Reference'</span>,<span class="string">'White'</span>,<span class="string">'Green'</span>,<span class="string">'UV'</span>,<span class="string">'Deep Blue'</span>,<span class="string">'Blue'</span>,<span class="string">'Red'</span>,<span class="string">'Violet'</span>,<span class="string">'Cyan'</span>,<span class="string">'QTH'</span>})
+grid <span class="string">on</span>;
+axis([400 1100 0 2.5]);
+title(<span class="string">'Spectral Irradiance of Each component'</span>);
+xlabel(<span class="string">'Wavelength (nm)'</span>);
+ylabel(<span class="string">'Spectral Irradiance (W/m^2 /nm )'</span>);
+
+figure (2);
+plot(Solar_reference(:,1).*1000,Solar_reference(:,2)./1000);
+
+hold <span class="string">on</span>
+axis([400 1100 0 2.5]);
+section=totalIrradiance(totalIrradiance(:,1)&gt;=300 &amp; totalIrradiance(:,1)&lt;=400,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+<span class="comment">%fprintf('300-400 %.1f\n',((LED_sum)/f).*100);</span>
+
+hold <span class="string">on</span>
+section=totalIrradiance(totalIrradiance(:,1)&gt;=400 &amp; totalIrradiance(:,1)&lt;=500,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf(<span class="string">'400-500 %.1f\n'</span>,((LED_sum)/first).*100);
+
+hold <span class="string">on</span>
+section=totalIrradiance(totalIrradiance(:,1)&gt;=500 &amp; totalIrradiance(:,1)&lt;=600,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf(<span class="string">'500-600 %.1f\n'</span>,((LED_sum)/second).*100);
+
+hold <span class="string">on</span>
+section=totalIrradiance(totalIrradiance(:,1)&gt;=600 &amp; totalIrradiance(:,1)&lt;=700,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf(<span class="string">'600-700 %.1f\n'</span>,((LED_sum)/third).*100);
+
+hold <span class="string">on</span>
+section=totalIrradiance(totalIrradiance(:,1)&gt;=700 &amp; totalIrradiance(:,1)&lt;=800,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf(<span class="string">'700-800 %.1f\n'</span>,((LED_sum)/fourth).*100);
+
+IR_axis = 800:1:1500;
+QTH_interp=interp1(totalIrradiance(:,1),totalIrradiance(:,2),IR_axis, <span class="string">'spine'</span>);
+IR = [IR_axis.' QTH_interp.'];
+hold <span class="string">on</span>
+section=IR(IR(:,1)&gt;=800 &amp; IR(:,1)&lt;=900,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf(<span class="string">'800-900 %.1f\n'</span>,((LED_sum)/fifth).*100);
+
+hold <span class="string">on</span>
+section=IR(IR(:,1)&gt;=900 &amp; IR(:,1)&lt;=1100,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf(<span class="string">'900-1100 %.1f\n'</span>,((LED_sum)/six).*100);
+
+hold <span class="string">on</span>
+section=IR(IR(:,1)&gt;=1100 &amp; IR(:,1)&lt;=1200,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+<span class="comment">%fprintf('1100-1300 %.1f\n',((LED_sum)/total).*100);</span>
+
+hold <span class="string">on</span>
+section=IR(IR(:,1)&gt;=1200 &amp; IR(:,1)&lt;=1300,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+<span class="comment">%fprintf('1200-1300 %.1f\n',((LED_sum)/total).*100);</span>
+
+hold <span class="string">on</span>
+section=IR(IR(:,1)&gt;=1300 &amp; IR(:,1)&lt;=1400,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+<span class="comment">%fprintf('1200-1300 %.1f\n',((LED_sum)/total).*100);</span>
+
+hold <span class="string">on</span>
+section=IR(IR(:,1)&gt;=1400 &amp; IR(:,1)&lt;=1500,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+<span class="comment">%fprintf('1200-1300 %.1f\n',((LED_sum)/total).*100);</span>
+
+hold <span class="string">on</span>
+plot(Solar_reference(:,1).*1000,Solar_reference(:,2)./1000);
+legend({<span class="string">'ASTM Solar Reference'</span>});
+hold <span class="string">off</span>
+grid <span class="string">on</span>;
+title(<span class="string">'Plot of AM0 Spectral Match Groups'</span>);
+xlabel(<span class="string">'Wavelength (nm)'</span>);
+ylabel(<span class="string">'Spectral Irradiance (W/m^2 /nm )'</span>);
+</pre><pre class="codeoutput">The Non-Uniformity is 6.4%
+400-500 102.7
+500-600 102.1
+600-700 89.0
+700-800 94.3
+800-900 103.5
+900-1100 136.8
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%Using Values from Spectral_Matchv1, the intensity and flux can be calculated
+%interchangeably. This Script places LED lambertian light sources 118mm
+%above test area of 2500mm^2.
+clc;
+clear;
+close all;
+
+%Assigning test area and distance from
+LENGTH = 0.05;
+AREA = LENGTH.^2;
+x=0:LENGTH/10:LENGTH;
+y=0:LENGTH/10:LENGTH;
+DISTANCE =0.118;
+
+LED_W_Positions = [ 
+    0 0 DISTANCE; 
+    0.035 0 DISTANCE;
+    0.035 0.035 DISTANCE; 
+    0.035 -0.035 DISTANCE;
+    -0.035 0.035 DISTANCE;
+    -0.035 -0.035 DISTANCE;
+    -0.035 0 DISTANCE;
+    0 -0.035 DISTANCE;
+    0 0.035 DISTANCE
+    ];
+sum = zeros(length(x),length(x));
+for i = 1:9
+    [X Y LED] = LED_irradiance(LED_W_Positions(i,:),0.2835,LENGTH, 120);
+    sum =sum+LED;
+end
+W= trapz(y,trapz(x,sum,2));
+W=W./AREA;
+% figure (1);
+% nexttile;
+% surf(X,Y,sum);
+% view(2);
+% colorbar
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+% zlim([180 200]);
+
+% figure(2);
+LED_DP_Positions = [ 
+     -0.00551 0 DISTANCE
+];
+sumBuffer = zeros(length(x),length(x));
+for i = 1:1
+    [X Y LED] = LED_irradiance(LED_DP_Positions(i,:),0.21867,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+end
+DP= trapz(y,trapz(x,sumBuffer,2));
+DP=DP./AREA;
+% surf(X,Y,sumBuffer);
+% colorbar
+% view(2);
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+
+sum = sum+sumBuffer;
+
+% figure(3);
+LED_G_Positions = [ 
+    0.02183 0.01863 DISTANCE;
+    0.02183 -0.01863 DISTANCE;
+    -0.02183 0.01863 DISTANCE;
+    -0.02183 -0.01863 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+for i = 1:4
+    [X Y LED] = LED_irradiance(LED_G_Positions(i,:),0.089,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+end
+G= trapz(y,trapz(x,sumBuffer,2));
+G=G./AREA;
+% surf(X,Y,sumBuffer);
+% colorbar
+% view(2);
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+
+sum = sum+sumBuffer;
+
+% figure(4);
+LED_R_Positions = [ 
+    0.035 -0.01398 DISTANCE;
+    -0.01207 -0.035 DISTANCE;
+    -0.035 0.02356 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+for i = 1:3
+    [X Y LED] = LED_irradiance(LED_R_Positions(i,:),0.08976,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+end
+R= trapz(y,trapz(x,sumBuffer,2));
+R=R./AREA;
+% surf(X,Y,sumBuffer);
+% colorbar
+% view(2);
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+
+sum = sum+sumBuffer;
+
+% figure(5);
+LED_UV_Positions = [
+    0.01313 0.01313 DISTANCE;
+    0.01313 -0.01313 DISTANCE;
+    -0.01313 0.01313 DISTANCE;
+    -0.01313 -0.01313 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+for i = 1:3
+    [X Y LED] = LED_irradiance(LED_UV_Positions(i,:),0.1273,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+end
+UV= trapz(y,trapz(x,sumBuffer,2));
+UV=UV./AREA;
+% surf(X,Y,sumBuffer);
+% colorbar
+% view(2);
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+
+sum=sum+sumBuffer;
+
+% figure(6);
+LED_V_Positions = [ 
+    -0.01313 0.02123 DISTANCE;
+    0.01313 -0.02123 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+for i = 1:2
+    [X Y LED] = LED_irradiance(LED_V_Positions(i,:),0.1089,LENGTH, 165);
+    sumBuffer =sumBuffer+LED;
+end
+V= trapz(y,trapz(x,sumBuffer,2));
+V=V./AREA;
+% surf(X,Y,sumBuffer);
+% colorbar
+% view(2);
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+
+sum =sum+sumBuffer;
+
+% figure(7);
+LED_C_Positions = [ 
+    -0.035 -0.00551 DISTANCE;
+    0.00551 0.035 DISTANCE;
+    0.035 -0.029 DISTANCE;
+];
+sumBuffer = zeros(length(x),length(x));
+for i = 1:3
+    [X Y LED] = LED_irradiance(LED_C_Positions(i,:),0.1344,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+end
+C= trapz(y,trapz(x,sumBuffer,2));
+C=C./AREA;
+% surf(X,Y,sumBuffer);
+% colorbar
+% view(2);
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+
+sum=sum+sumBuffer;
+
+% figure(8);
+LED_B_Positions = [ 
+    %%
+    % 
+    %  PREFORMATTED
+    %  TEXT
+    % 
+    0.00551 0 DISTANCE;
+
+];
+sumBuffer = zeros(length(x),length(x));
+for i = 1:1
+    [X Y LED] = LED_irradiance(LED_B_Positions(i,:),0.072188,LENGTH, 120);
+    sumBuffer =sumBuffer+LED;
+end
+B= trapz(y,trapz(x,sumBuffer,2));
+B=B./AREA;
+% surf(X,Y,sumBuffer);
+% colorbar
+% view(2);
+% xlabel('Cubesat X Coordinate m');
+% ylabel('Cubesat Y Coordinate m');
+% zlabel('Irradiance W/m^2');
+
+sum=sum+sumBuffer;
+
+figure(9);
+surf(X,Y,sum);
+cbar =colorbar;
+cbar.Label.String = 'Irradiance W/m^2';
+
+view(2);
+xlabel('Cubesat X Coordinate (m)');
+ylabel('Cubesat Y Coordinate (m)');
+zlabel('Irradiance W/m^2');
+title('Irradiance on CubeSat Surface with 0.118m Distance');
+
+max = max(max(sum));
+min=min(min(sum));
+fprintf('The Non-Uniformity is %.1f%%\n',((max-min)./(max+min)).*100);
+
+figure (10);
+plot(LED_C_Positions(:,1),LED_C_Positions(:,2),'cX','Markersize',20);
+hold on
+plot(LED_DP_Positions(:,1),LED_DP_Positions(:,2),'X','Markersize',20);
+hold on
+plot(LED_G_Positions(:,1),LED_G_Positions(:,2),'gX','Markersize',20);
+hold on
+plot(LED_R_Positions(:,1),LED_R_Positions(:,2),'rX','Markersize',20);
+hold on
+plot(LED_UV_Positions(:,1),LED_UV_Positions(:,2),'X','Markersize',20);
+hold on
+plot(LED_V_Positions(:,1),LED_V_Positions(:,2),'mX','Markersize',20);
+hold on
+plot(LED_W_Positions(:,1),LED_W_Positions(:,2),'kX','Markersize',20);
+hold on
+plot(LED_B_Positions(:,1),LED_B_Positions(:,2),'bX','Markersize',20);
+%hold on
+%circle([LED_C_Positions(:,1);LED_DP_Positions(:,1);LED_G_Positions(:,1);LED_R_Positions(:,1);LED_UV_Positions(:,1);LED_V_Positions(:,1);LED_W_Positions(:,1);LED_B_Positions(:,1)],[LED_C_Positions(:,2);LED_DP_Positions(:,2);LED_G_Positions(:,2);LED_R_Positions(:,2);LED_UV_Positions(:,2);LED_V_Positions(:,2);LED_W_Positions(:,2);LED_B_Positions(:,2)], 0.0198);
+hold off
+axis equal;
+axis([-0.07/2 0.07/2 -0.07/2 0.07/2])
+legend('Cyan','Deep Blue', 'Green', 'Red', 'UV','Violet','White','Blue');
+title('LED Bulb Placement on Panel');
+xlabel('X position (m)'); 
+ylabel('Y position (m)'); 
+
+%Retrieves Solar Spectrum and creates a matrix with the visible spectrum
+filename='ASTM_SolarIrradiance_AM0.csv';
+Solar_reference = csvread(filename,1,0,[1 0 1697 1]);
+total=trapz(Solar_reference(:,1),Solar_reference(:,2));
+slot = Solar_reference(Solar_reference(:,1)>0.4 & Solar_reference(:,1)<0.5,:);
+first = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)>0.5 & Solar_reference(:,1)<0.6,:);
+second = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)>0.6 & Solar_reference(:,1)<0.7,:);
+third = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)>0.7 & Solar_reference(:,1)<0.8,:);
+fourth = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)>0.8 & Solar_reference(:,1)<0.9,:);
+fifth = trapz(slot(:,1),slot(:,2));
+slot = Solar_reference(Solar_reference(:,1)>0.9 & Solar_reference(:,1)<1.1,:);
+six = trapz(slot(:,1),slot(:,2));
+
+%Retrieves Blue LED portion of curve and converts it to scaled intensity
+filename='white_blue_v2_spectrum.csv';
+LED_W_B =csvread(filename,1,0,[1 0 66 1]);
+
+blue_intensity_multiplier = (W.*0.2368) ./ (trapz(LED_W_B(:,1), LED_W_B(:,2)));
+LED_W_B (:,2) = LED_W_B(:,2) .*blue_intensity_multiplier; %should be in w/nm
+
+%Retrieves yellow LED portion of curve and converts it to scaled intensity
+filename='white_yellow_v2_spectrum.csv';
+LED_W_Y =csvread(filename,1,0,[1 0 136 1]);
+
+yellow_intensity_multiplier = (W.*0.7632) ./ (trapz(LED_W_Y(:,1), LED_W_Y(:,2)));
+LED_W_Y (:,2) = LED_W_Y(:,2) .*yellow_intensity_multiplier; %should be in w/nm
+
+LED_W= [LED_W_B(1:end-1,:);LED_W_Y];
+
+
+%Reads Deep Blue from data
+filename='GD_CSXPM1_14_20160712_spectrum.csv';
+LED_B = csvread(filename,1,0,[1 0 66 1]);
+
+B_intensity_multiplier = DP ./ trapz(LED_B(:,1), LED_B(:,2));
+LED_B (:,2) = LED_B(:,2) .*B_intensity_multiplier; %should be in w/nm
+
+%Getting Far red spectrum from data
+filename='far_red_spectrum.csv';
+LED_R = csvread(filename,1,0,[1 0 136 1]);
+
+red_intensity_multiplier = R ./ trapz(LED_R(:,1), LED_R(:,2));
+LED_R (:,2) = LED_R(:,2) .*red_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the UV LED using a guasing
+LED_UV= guass_estimate(405,20);
+UV_intensity_multiplier = UV ./ trapz(LED_UV(:,1), LED_UV(:,2));
+LED_UV (:,2) = LED_UV(:,2) .*UV_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the Violet LED using a guasing
+LED_V= guass_estimate(425,20);
+V_intensity_multiplier = V ./ trapz(LED_V(:,1), LED_V(:,2));
+LED_V (:,2) = LED_V(:,2) .*V_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the Cyan LED using a guasing
+LED_C= guass_estimate(490,25);
+C_intensity_multiplier = C ./ trapz(LED_C(:,1), LED_C(:,2));
+LED_C (:,2) = LED_C(:,2) .*C_intensity_multiplier; %should be in w/nm
+
+%creates an estimate for the royal blue using a guasing
+LED_BB= guass_estimate(475,20);
+Bblue_intensity_multiplier = DP ./ (trapz(LED_BB(:,1),LED_BB(:,2)));
+LED_BB (:,2) = LED_BB(:,2) .*Bblue_intensity_multiplier; %should be in w/nm
+
+%Retrieves Green LED portion of curve and converts it to scaled intensity
+% filename='GREEN_LED.csv';
+% LED_G = csvread(filename,1,0,[1 0 100 1]);
+filename='true_green_spectrum.csv';
+LED_G = csvread(filename,1,0,[1 0 150 1]);
+green_intensity_multiplier= G ./ (trapz(LED_G(:,1),LED_G(:,2)));
+LED_G (:,2) = (LED_G(:,2) .*green_intensity_multiplier); %should be in w/nm
+
+%Retrieves IR data
+filename='QTH_V1.csv';
+QTH = csvread(filename,1,0,[1 0 211 1]);
+QTH(:,2)= QTH(:,2)/4; %Converting mW values to W values and multiply by 25 due to emitting closer
+
+totalIrradiance = combineSpectrum(LED_W,LED_UV,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_G,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_B,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_BB,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_R,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_V,1,1);
+totalIrradiance = combineSpectrum(totalIrradiance,LED_C,1,1);
+totalIrradiance(:,2)=totalIrradiance(:,2).*1.5;
+totalIrradiance=combineSpectrum(totalIrradiance,QTH,1,1);
+figure (1);
+plot(Solar_reference(:,1).*1000,(Solar_reference(:,2)./1000));
+hold on
+plot(LED_W(:,1),(LED_W(:,2)));
+hold on
+plot(LED_G(:,1),(LED_G(:,2)));
+hold on
+plot(LED_UV(:,1),(LED_UV(:,2)));
+hold on
+plot(LED_BB(:,1),(LED_BB(:,2)));
+hold on
+plot(LED_B(:,1),(LED_B(:,2)));
+hold on
+plot(LED_R(:,1),(LED_R(:,2)));
+hold on
+plot(LED_V(:,1),(LED_V(:,2)));
+hold on
+plot(LED_C(:,1),(LED_C(:,2)));
+hold on
+plot(QTH(:,1),QTH(:,2));
+hold off
+
+legend({'ASTM Solar Reference','White','Green','UV','Deep Blue','Blue','Red','Violet','Cyan','QTH'})
+grid on;
+axis([400 1100 0 2.5]);
+title('Spectral Irradiance of Each component');
+xlabel('Wavelength (nm)'); 
+ylabel('Spectral Irradiance (W/m^2 /nm )');
+
+figure (2);
+plot(Solar_reference(:,1).*1000,Solar_reference(:,2)./1000);
+
+hold on
+axis([400 1100 0 2.5]);
+section=totalIrradiance(totalIrradiance(:,1)>=300 & totalIrradiance(:,1)<=400,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+%fprintf('300-400 %.1f\n',((LED_sum)/f).*100);
+
+hold on
+section=totalIrradiance(totalIrradiance(:,1)>=400 & totalIrradiance(:,1)<=500,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf('400-500 %.1f\n',((LED_sum)/first).*100);
+
+hold on
+section=totalIrradiance(totalIrradiance(:,1)>=500 & totalIrradiance(:,1)<=600,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf('500-600 %.1f\n',((LED_sum)/second).*100);
+
+hold on
+section=totalIrradiance(totalIrradiance(:,1)>=600 & totalIrradiance(:,1)<=700,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf('600-700 %.1f\n',((LED_sum)/third).*100);
+
+hold on
+section=totalIrradiance(totalIrradiance(:,1)>=700 & totalIrradiance(:,1)<=800,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf('700-800 %.1f\n',((LED_sum)/fourth).*100);
+
+IR_axis = 800:1:1500;
+QTH_interp=interp1(totalIrradiance(:,1),totalIrradiance(:,2),IR_axis, 'spine');
+IR = [IR_axis.' QTH_interp.'];
+hold on
+section=IR(IR(:,1)>=800 & IR(:,1)<=900,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf('800-900 %.1f\n',((LED_sum)/fifth).*100);
+
+hold on
+section=IR(IR(:,1)>=900 & IR(:,1)<=1100,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+fprintf('900-1100 %.1f\n',((LED_sum)/six).*100);
+
+hold on
+section=IR(IR(:,1)>=1100 & IR(:,1)<=1200,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+%fprintf('1100-1300 %.1f\n',((LED_sum)/total).*100);
+
+hold on
+section=IR(IR(:,1)>=1200 & IR(:,1)<=1300,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+%fprintf('1200-1300 %.1f\n',((LED_sum)/total).*100);
+
+hold on
+section=IR(IR(:,1)>=1300 & IR(:,1)<=1400,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+%fprintf('1200-1300 %.1f\n',((LED_sum)/total).*100);
+
+hold on
+section=IR(IR(:,1)>=1400 & IR(:,1)<=1500,:);
+LED_sum=trapz(section(:,1),section(:,2));
+area(section(:,1),section(:,2));
+%fprintf('1200-1300 %.1f\n',((LED_sum)/total).*100);
+
+hold on
+plot(Solar_reference(:,1).*1000,Solar_reference(:,2)./1000);
+legend({'ASTM Solar Reference'});
+hold off
+grid on;
+title('Plot of AM0 Spectral Match Groups');
+xlabel('Wavelength (nm)'); 
+ylabel('Spectral Irradiance (W/m^2 /nm )');
+
+##### SOURCE END #####
+--></body></html>

@@ -1,22 +1,27 @@
+%Using Values from Spectral_Matchv1, the intensity and flux can be calculated
+%interchangeably. This Script places LED lambertian light sources 118mm
+%above test area of 2500mm^2.
 clc;
 clear;
 close all;
 
-LENGTH = 0.08;
+%Assigning test area and distance from
+LENGTH = 0.05;
 AREA = LENGTH.^2;
 x=0:LENGTH/10:LENGTH;
 y=0:LENGTH/10:LENGTH;
 DISTANCE =0.118;
+
 LED_W_Positions = [ 
-    0.005 0 DISTANCE; 
-    -0.025 0 DISTANCE;
-    -0.025 0.025 DISTANCE; 
-    -0.025 -0.025 DISTANCE;
-    0 0.025 DISTANCE;
-    0 -0.025 DISTANCE;
-    0.025 0 DISTANCE;
-    0.025 0.025 DISTANCE;
-    0.025 -0.025 DISTANCE
+    0 0 DISTANCE; 
+    0.035 0 DISTANCE;
+    0.035 0.035 DISTANCE; 
+    0.035 -0.035 DISTANCE;
+    -0.035 0.035 DISTANCE;
+    -0.035 -0.035 DISTANCE;
+    -0.035 0 DISTANCE;
+    0 -0.035 DISTANCE;
+    0 0.035 DISTANCE
     ];
 sum = zeros(length(x),length(x));
 for i = 1:9
@@ -37,7 +42,7 @@ W=W./AREA;
 
 % figure(2);
 LED_DP_Positions = [ 
-    -0.005 0 DISTANCE
+     -0.00551 0 DISTANCE
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:1
@@ -57,10 +62,10 @@ sum = sum+sumBuffer;
 
 % figure(3);
 LED_G_Positions = [ 
-    0.020 0.02 DISTANCE;
-    0.02 -0.02 DISTANCE;
-    -0.02 0.02 DISTANCE;
-    -0.02 -0.02 DISTANCE;
+    0.02183 0.01863 DISTANCE;
+    0.02183 -0.01863 DISTANCE;
+    -0.02183 0.01863 DISTANCE;
+    -0.02183 -0.01863 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:4
@@ -80,9 +85,9 @@ sum = sum+sumBuffer;
 
 % figure(4);
 LED_R_Positions = [ 
-    -0.025 0.02 DISTANCE;
-    0.025 0.005 DISTANCE;
-    -0.005 -0.025 DISTANCE;
+    0.035 -0.01398 DISTANCE;
+    -0.01207 -0.035 DISTANCE;
+    -0.035 0.02356 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:3
@@ -102,10 +107,10 @@ sum = sum+sumBuffer;
 
 % figure(5);
 LED_UV_Positions = [
-    0.015 0.015 DISTANCE;
-    0.015 -0.015 DISTANCE;
-    -0.015 0.015 DISTANCE;
-    -0.015 -0.015 DISTANCE;
+    0.01313 0.01313 DISTANCE;
+    0.01313 -0.01313 DISTANCE;
+    -0.01313 0.01313 DISTANCE;
+    -0.01313 -0.01313 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:3
@@ -125,8 +130,8 @@ sum=sum+sumBuffer;
 
 % figure(6);
 LED_V_Positions = [ 
-    -0.015 0.02 DISTANCE;
-    0.015 -0.02 DISTANCE;
+    -0.01313 0.02123 DISTANCE;
+    0.01313 -0.02123 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:2
@@ -146,9 +151,9 @@ sum =sum+sumBuffer;
 
 % figure(7);
 LED_C_Positions = [ 
-    -0.025 -0.005 DISTANCE;
-    0.005 0.025 DISTANCE;
-    0.025 -0.02 DISTANCE;
+    -0.035 -0.00551 DISTANCE;
+    0.00551 0.035 DISTANCE;
+    0.035 -0.029 DISTANCE;
 ];
 sumBuffer = zeros(length(x),length(x));
 for i = 1:3
@@ -168,7 +173,12 @@ sum=sum+sumBuffer;
 
 % figure(8);
 LED_B_Positions = [ 
-    0 -0.005 DISTANCE;
+    %%
+    % 
+    %  PREFORMATTED
+    %  TEXT
+    % 
+    0.00551 0 DISTANCE;
 
 ];
 sumBuffer = zeros(length(x),length(x));
@@ -222,7 +232,7 @@ plot(LED_B_Positions(:,1),LED_B_Positions(:,2),'bX','Markersize',20);
 %circle([LED_C_Positions(:,1);LED_DP_Positions(:,1);LED_G_Positions(:,1);LED_R_Positions(:,1);LED_UV_Positions(:,1);LED_V_Positions(:,1);LED_W_Positions(:,1);LED_B_Positions(:,1)],[LED_C_Positions(:,2);LED_DP_Positions(:,2);LED_G_Positions(:,2);LED_R_Positions(:,2);LED_UV_Positions(:,2);LED_V_Positions(:,2);LED_W_Positions(:,2);LED_B_Positions(:,2)], 0.0198);
 hold off
 axis equal;
-axis([-LENGTH/2 LENGTH/2 -LENGTH/2 LENGTH/2])
+axis([-0.07/2 0.07/2 -0.07/2 0.07/2])
 legend('Cyan','Deep Blue', 'Green', 'Red', 'UV','Violet','White','Blue');
 title('LED Bulb Placement on Panel');
 xlabel('X position (m)'); 
