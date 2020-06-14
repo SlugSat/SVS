@@ -1,4 +1,115 @@
-EESchema Schematic File Version 2
-EELAYER 25 0
+EESchema Schematic File Version 4
+EELAYER 30 0
 EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Device:LED D?
+U 1 1 5ECE6410
+P 6000 1300
+F 0 "D?" V 6039 1183 50  0000 R CNN
+F 1 "White" V 5948 1183 50  0000 R CNN
+F 2 "" H 6000 1300 50  0001 C CNN
+F 3 "~" H 6000 1300 50  0001 C CNN
+	1    6000 1300
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECE7876
+P 6000 1600
+F 0 "D?" V 6039 1483 50  0000 R CNN
+F 1 "White" V 5948 1483 50  0000 R CNN
+F 2 "" H 6000 1600 50  0001 C CNN
+F 3 "~" H 6000 1600 50  0001 C CNN
+	1    6000 1600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECE7C83
+P 6000 1900
+F 0 "D?" V 6039 1783 50  0000 R CNN
+F 1 "White" V 5948 1783 50  0000 R CNN
+F 2 "" H 6000 1900 50  0001 C CNN
+F 3 "~" H 6000 1900 50  0001 C CNN
+	1    6000 1900
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECE7F8F
+P 6000 2200
+F 0 "D?" V 6039 2083 50  0000 R CNN
+F 1 "White" V 5948 2083 50  0000 R CNN
+F 2 "" H 6000 2200 50  0001 C CNN
+F 3 "~" H 6000 2200 50  0001 C CNN
+	1    6000 2200
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECE82A4
+P 6000 2500
+F 0 "D?" V 6039 2383 50  0000 R CNN
+F 1 "White" V 5948 2383 50  0000 R CNN
+F 2 "" H 6000 2500 50  0001 C CNN
+F 3 "~" H 6000 2500 50  0001 C CNN
+	1    6000 2500
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECE849F
+P 6000 2800
+F 0 "D?" V 6039 2683 50  0000 R CNN
+F 1 "White" V 5948 2683 50  0000 R CNN
+F 2 "" H 6000 2800 50  0001 C CNN
+F 3 "~" H 6000 2800 50  0001 C CNN
+	1    6000 2800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECE86DE
+P 6000 3100
+F 0 "D?" V 6039 2983 50  0000 R CNN
+F 1 "White" V 5948 2983 50  0000 R CNN
+F 2 "" H 6000 3100 50  0001 C CNN
+F 3 "~" H 6000 3100 50  0001 C CNN
+	1    6000 3100
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECEB894
+P 6000 1000
+F 0 "D?" V 6039 883 50  0000 R CNN
+F 1 "White" V 5948 883 50  0000 R CNN
+F 2 "" H 6000 1000 50  0001 C CNN
+F 3 "~" H 6000 1000 50  0001 C CNN
+	1    6000 1000
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 5ECEC001
+P 6000 3400
+F 0 "D?" V 6039 3283 50  0000 R CNN
+F 1 "White" V 5948 3283 50  0000 R CNN
+F 2 "" H 6000 3400 50  0001 C CNN
+F 3 "~" H 6000 3400 50  0001 C CNN
+	1    6000 3400
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC

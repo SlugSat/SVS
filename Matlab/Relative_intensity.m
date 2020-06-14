@@ -7,7 +7,6 @@ filename='ASTM_SolarIrradiance_AM0.csv';
 Solar_reference = csvread(filename,1,0,[1 0 1697 1]);
 
 colorSpectrum = Solar_reference(Solar_reference(:,1)>0.3 & Solar_reference(:,1)<0.9,:);
-
 total=trapz(Solar_reference(:,1),Solar_reference(:,2));
 slot = Solar_reference(Solar_reference(:,1)>0.4 & Solar_reference(:,1)<0.5,:);
 first = trapz(slot(:,1),slot(:,2));
@@ -39,7 +38,7 @@ filename='QTH_v1.csv';
 QTH = csvread(filename,1,0,[1 0 212 1]);
 
 %creates an estimate for the Deep Blue LED using a guasing
-watt=.660/2; %with current being near 0.25A
+watt=.660/2; %with current being near 0.3A
 filename='GD_CSXPM1_14_20160712_spectrum.csv';
 LED_B = csvread(filename,1,0,[1 0 66 1]);
 
@@ -47,7 +46,7 @@ B_intensity_multiplier = watt ./ trapz(LED_B(:,1), LED_B(:,2));
 LED_B (:,2) = LED_B(:,2) .*B_intensity_multiplier; %should be in w/nm
 
 %Getting Far red spectrum from data
-watt = 0.383/2; % at 200mA
+watt = 0.383/2; % at 300mA
 filename='far_red_spectrum.csv';
 LED_R = csvread(filename,1,0,[1 0 136 1]);
 
@@ -55,7 +54,7 @@ red_intensity_multiplier = watt ./ trapz(LED_R(:,1), LED_R(:,2));
 LED_R (:,2) = LED_R(:,2) .*red_intensity_multiplier; %should be in w/nm
 
 %creates an estimate for the UV LED using a guasing
-watt=.930/2; %with current being near 0.25A
+watt=.930/2; %with current being near 0.3A
 LED_UV= guass_estimate(405,20);
 
 UV_intensity_multiplier = watt ./ trapz(LED_UV(:,1), LED_UV(:,2));
@@ -72,16 +71,14 @@ Bblue_intensity_multiplier = (lumen) ./ (683*trapz(photopic_band(:,1), LED_BB_in
 LED_BB (:,2) = LED_BB(:,2) .*Bblue_intensity_multiplier; %should be in w/nm
 
 %Retrieves Blue LED portion of curve and converts it to scaled intensity
-cd = 140;
-% filename='GW_CS8PM1_EM__blue__spectrum.csv';
-% LED_W_B = csvread(filename,1,0,[1 0 66 1]);
+lumen = 140;
 filename='white_blue_v2_spectrum.csv';
 LED_W_B =csvread(filename,1,0,[1 0 66 1]);
 
 photopic_band = photopic(photopic(:,1)>LED_W_B(1,1) & photopic(:,1)<LED_W_B(end,1),:);
 
 LED_W_interp=interp1(LED_W_B(:,1),LED_W_B(:,2),photopic_band(:,1));
-blue_intensity_multiplier = (cd.*0.0426) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+blue_intensity_multiplier = (lumen.*0.0426) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
 LED_W_B (:,2) = LED_W_B(:,2) .*blue_intensity_multiplier; %should be in w/nm
 
 %Retrieves yellow LED portion of curve and converts it to scaled intensity
@@ -93,7 +90,7 @@ LED_W_Y =csvread(filename,1,0,[1 0 136 1]);
 photopic_band = photopic (photopic(:,1)>LED_W_Y(1,1) & photopic(:,1)<LED_W_Y(end,1),:);
 
 LED_W_interp=interp1(LED_W_Y(:,1),LED_W_Y(:,2),photopic_band(:,1));
-yellow_intensity_multiplier = (cd.*0.9574) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
+yellow_intensity_multiplier = (lumen.*0.9574) ./ (683*trapz(photopic_band(:,1), LED_W_interp.*photopic_band(:,2)));
 LED_W_Y (:,2) = LED_W_Y(:,2) .*yellow_intensity_multiplier; %should be in w/nm
 
 LED_W= [LED_W_B(1:end-1,:);LED_W_Y];
@@ -114,10 +111,10 @@ LED_G (:,2) = (LED_G(:,2) .*green_intensity_multiplier); %should be in w/nm
 
 N_W_LEDS=6; %number of white leds
 N_G_LEDS=1; %number of green leds
-N_UV_LEDS=1; %1 led will be taking up two spots
-N_QTH=0.25;
-N_B_LEDS=1;
-N_BB_LEDS=1;
+N_UV_LEDS=1; %1 
+N_QTH=0.25; %Quartz tungsten lamp
+N_B_LEDS=1; % Deep blue
+N_BB_LEDS=1; %
 N_R_LEDS=1;
 
 totalLED = combineSpectrum(LED_W,LED_UV,N_W_LEDS,N_UV_LEDS);

@@ -2,7 +2,7 @@ clc;
 clear;
 close all;
 
-LENGTH = 0.10;
+LENGTH = 0.08;
 AREA = LENGTH.^2;
 x=0:LENGTH/10:LENGTH;
 y=0:LENGTH/10:LENGTH;
@@ -340,10 +340,10 @@ hold on
 plot(QTH(:,1),QTH(:,2));
 hold off
 
-legend({'Solar Reference','White','Green','UV','Deep Blue','Blue','Red','Violet','Cyan','QTH'})
+legend({'ASTM Solar Reference','White','Green','UV','Deep Blue','Blue','Red','Violet','Cyan','QTH'})
 grid on;
 axis([400 1100 0 2.5]);
-title('Plot of Spectral Irradiance @ AM0 with Light Sources');
+title('Spectral Irradiance of Each component');
 xlabel('Wavelength (nm)'); 
 ylabel('Spectral Irradiance (W/m^2 /nm )');
 
@@ -422,7 +422,7 @@ area(section(:,1),section(:,2));
 
 hold on
 plot(Solar_reference(:,1).*1000,Solar_reference(:,2)./1000);
-
+legend({'ASTM Solar Reference'});
 hold off
 grid on;
 title('Plot of AM0 Spectral Match Groups');
